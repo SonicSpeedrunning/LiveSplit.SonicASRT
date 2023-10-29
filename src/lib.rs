@@ -16,14 +16,14 @@ use asr::{
     time::Duration,
     timer::{self, TimerState},
     watcher::{Pair, Watcher},
-    Address, Address32, Process,
+    Address, Address32, Process, settings::Gui,
 };
 
 asr::panic_handler!();
 asr::async_main!(nightly);
 
 async fn main() {
-    let settings = Settings::register();
+    let mut settings = Settings::register();
 
     loop {
         // Hook to the target process
@@ -44,6 +44,7 @@ async fn main() {
                     // 2. If the timer is currently either running or paused, then the isLoading, gameTime, and reset actions will be run.
                     // 3. If reset does not return true, then the split action will be run.
                     // 4. If the timer is currently not running (and not paused), then the start action will be run.
+                    settings.update();
                     update_loop(&process, &addresses, &mut watchers);
 
                     let timer_state = timer::state();
@@ -87,7 +88,7 @@ async fn main() {
     }
 }
 
-#[derive(asr::user_settings::Settings)]
+#[derive(Gui)]
 struct Settings {
     #[default = false]
     /// -------- START OPTIONS --------
@@ -538,7 +539,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
                 watchers
                     .game_mode
                     .pair
-                    .unwrap_or_else(|| Pair {
+                    .unwrap_or(Pair {
                         current: GameMode::WorldTour,
                         old: GameMode::WorldTour,
                     })
@@ -612,7 +613,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
                 watchers
                     .track_id
                     .pair
-                    .unwrap_or_else(|| Pair {
+                    .unwrap_or(Pair {
                         old: Tracks::OceanView,
                         current: Tracks::OceanView,
                     })
@@ -626,7 +627,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
         .unwrap_or_default();
     let mut stars = game
         .read::<[u8; 0x719]>(sunshine_coast)
-        .unwrap_or_else(|_| [0; 0x719]);
+        .unwrap_or([0; 0x719]);
     watchers.coastal_cruise.update_infallible(stars[0x7C]);
     watchers.studio_scrapes.update_infallible(stars[0x138]);
     watchers.battlezone_blast.update_infallible(stars[0x1F4]);
@@ -641,7 +642,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
         .unwrap_or_default();
     stars = game
         .read::<[u8; 0x719]>(frozen_valley)
-        .unwrap_or_else(|_| [0; 0x719]);
+        .unwrap_or([0; 0x719]);
     watchers.snowball_shakedown.update_infallible(stars[0x7C]);
     watchers.banana_boost.update_infallible(stars[0x138]);
     watchers.shinobi_scramble.update_infallible(stars[0x1F4]);
@@ -658,7 +659,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
         .unwrap_or_default();
     stars = game
         .read::<[u8; 0x719]>(scorching_skies)
-        .unwrap_or_else(|_| [0; 0x719]);
+        .unwrap_or([0; 0x719]);
     watchers.adder_assault.update_infallible(stars[0x7C]);
     watchers.dreamy_drive.update_infallible(stars[0x138]);
     watchers.sanctuary_speedway.update_infallible(stars[0x1F4]);
@@ -675,7 +676,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
         .unwrap_or_default();
     stars = game
         .read::<[u8; 0x719]>(twilight_engine)
-        .unwrap_or_else(|_| [0; 0x719]);
+        .unwrap_or([0; 0x719]);
     watchers.booty_boost.update_infallible(stars[0x7C]);
     watchers.racing_rangers.update_infallible(stars[0x138]);
     watchers.shinobi_showdown.update_infallible(stars[0x1F4]);
@@ -694,7 +695,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
         .unwrap_or_default();
     stars = game
         .read::<[u8; 0x719]>(moonlight_park)
-        .unwrap_or_else(|_| [0; 0x719]);
+        .unwrap_or([0; 0x719]);
     watchers.carnival_clash.update_infallible(stars[0x7C]);
     watchers.curien_curves.update_infallible(stars[0x138]);
     watchers.molten_mayhem.update_infallible(stars[0x1F4]);
@@ -711,7 +712,7 @@ fn update_loop(game: &Process, addresses: &Addresses, watchers: &mut Watchers) {
         .unwrap_or_default();
     stars = game
         .read::<[u8; 0x719]>(superstar_showdown)
-        .unwrap_or_else(|_| [0; 0x719]);
+        .unwrap_or([0; 0x719]);
     watchers.rapid_ruins.update_infallible(stars[0x7C]);
     watchers.zombie_zoom.update_infallible(stars[0x138]);
     watchers.maracar_madness.update_infallible(stars[0x1F4]);
